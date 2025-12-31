@@ -1,0 +1,138 @@
+/*
+ * Variant: Tokyo Night (Beautified)
+ * Maintainer: AI Assistant
+ */
+
+@define-color base rgba(26, 27, 38, 0.55); /* Tokyo Night background */
+@define-color surface rgba(41, 42, 57, 0.65); /* Slightly lighter, more transparent */
+@define-color overlay rgba(57, 53, 82, 0.75);
+
+@define-color muted #565a6e;
+@define-color subtle #7982a9;
+@define-color text #a9b1d6;
+@define-color love #f7768e;
+@define-color gold #e0af68;
+@define-color rose #bb9af7;
+@define-color pine #7aa2f7;
+@define-color foam #7dcfff;
+@define-color iris #c0caf5;
+
+@define-color highlightLow #1a1b26;
+@define-color highlightMed #292e42;
+@define-color highlightHigh #414868;
+
+* {
+  font-family: Fira Code Nerd Font, JetBrains Mono, monospace;
+  font-size: 15px;
+  border-radius: 14px;
+  min-height: 0px;
+  box-shadow: none;
+  font-weight: bold;
+  /* transition: background 0.2s, color 0.2s, box-shadow 0.2s; */
+}
+
+window#waybar {
+  background-color: @base;
+  color: @text;
+  opacity: 1;
+  border-radius: 8px;
+  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.18);
+  border: 1.5px solid rgba(200, 200, 255, 0.08);
+  margin: 16px 16px 16px 16px;
+  padding: 4px 12px;
+}
+
+#workspaces {
+  background-color: transparent;
+  padding: 0 6px;
+  border-radius: 6px;
+}
+
+#workspaces button {
+  padding: 0 10px;
+  color: @iris;
+  background: #1a1b26;
+  border-radius: 5px;
+  margin: 0 3px;
+  border: none;
+  box-shadow: 0 2px 8px 0 rgba(31, 38, 135, 0.04);
+  font-weight: bold;
+}
+#workspaces button.active {
+  background: #414868;
+  color: @text;
+  font-weight: bold;
+  box-shadow: 0 2px 8px 0 rgba(65, 72, 104, 0.18);
+}
+#workspaces button:hover {
+  background: #292e42;
+  color: @text;
+}
+
+#battery, #pulseaudio, #cpu, #memory, #temperature, #clock, #tray, #custom-icon, #window {
+  background: #1a1b26;
+  color: @gold;
+  font-weight: 500;
+  margin: 0 4px;
+  padding: 0 7px;
+  border-radius: 6px;
+  box-shadow: 0 2px 8px 0 rgba(31, 38, 135, 0.06);
+  border: 1px solid rgba(200, 200, 255, 0.06);
+}
+#battery {
+  color: @gold;
+}
+#pulseaudio {
+  color: @foam;
+}
+#cpu {
+  color: @pine;
+}
+#memory {
+  color: @rose;
+}
+#temperature {
+  color: @love;
+}
+#clock {
+  color: @iris;
+}
+#tray {
+  color: @subtle;
+}
+#custom-icon {
+  color: @text;
+}
+
+#battery.warning {
+  background: @love;
+  color: @base;
+}
+
+.modules-left, .modules-center, .modules-right {
+  background: transparent;
+  padding: 0 6px;
+  border-radius: 6px;
+  margin: 0 2px;
+}
+
+#window {
+  color: @text;
+  background: #1a1b26;
+  padding: 0 16px;
+  border-radius: 6px;
+  margin: 0 8px;
+  box-shadow: 0 2px 8px 0 rgba(31, 38, 135, 0.04);
+}
+
+/* Hover and active effects for all widgets */
+#battery:hover, #pulseaudio:hover, #cpu:hover, #memory:hover, #temperature:hover, #clock:hover, #tray:hover, #custom-icon:hover, #window:hover {
+  background: @highlightMed;
+  color: @gold;
+  box-shadow: 0 4px 16px 0 rgba(31, 38, 135, 0.12);
+}
+
+/* Remove default outlines for a cleaner look */
+:focus {
+  outline: none;
+}

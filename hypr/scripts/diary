@@ -1,0 +1,28 @@
+#!/bin/bash
+
+# Define the diary directory
+DIARY_DIR="$HOME/diary"
+
+# Get the current date in YYYY-MM-DD format
+CURRENT_DATE=$(date +"%Y-%m-%d")
+
+# Define the file path
+FILE_PATH="$DIARY_DIR/$CURRENT_DATE.md"
+
+# Ensure the diary directory exists
+mkdir -p "$DIARY_DIR"
+
+# Check if the file for today's date already exists
+if [ ! -f "$FILE_PATH" ]; then
+  # Create the file and populate it with the current date and time in Markdown format
+  {
+    echo "# Diary Entry for $CURRENT_DATE"
+    echo ""
+    echo "Date: $(date +"%Y-%m-%d")"
+    echo "Time: $(date +"%H:%M:%S")"
+    echo ""
+  } >"$FILE_PATH"
+fi
+
+# Open the file in Neovim
+nvim "$FILE_PATH"

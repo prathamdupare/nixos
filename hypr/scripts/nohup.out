@@ -1,0 +1,2 @@
+sh: line 1: /home/pratham/.config/waybar/state: No such file or directory
+./statusbar: line 14:  2898 Segmentation fault      (core dumped) waybar --bar main-bar --log-level error --config ${CONFIG} --style ${STYLE}
