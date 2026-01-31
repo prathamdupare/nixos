@@ -19,10 +19,15 @@
     };
 
   fileSystems."/boot" =
-    { device = "/dev/disk/by-uuid/F658-CDC9";
-      fsType = "vfat";
-      options = [ "fmask=0077" "dmask=0077" ];
-    };
+  { device = "/dev/disk/by-uuid/F658-CDC9";
+    fsType = "vfat";
+    options = [
+      "fmask=0077"
+        "dmask=0077"
+        "nofail"
+        "x-systemd.fsck=no"
+    ];
+  };
 
   swapDevices = [ ];
 

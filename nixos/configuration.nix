@@ -1,14 +1,20 @@
 #Edit this configuration file to define what should be installed on
 # your system.  Help is available in the configuration.nix(5) man page
 # and in the NixOS manual (accessible by running 'nixos-help').
-{ config, pkgs, inputs, ... }: {
+{
+  config,
+  pkgs,
+  inputs,
+  lib,
+  ...
+}:
+{
   imports = [
     # Include the results of the hardware scan.
     ./hardware-configuration.nix
-# this line bro
+    # this line bro
     ./modules/nixvim/defaults.nix
   ];
-
 
   home-manager.users.pratham = {
     imports = [
@@ -17,23 +23,17 @@
 
     home.packages = [
       pkgs.atool
-        pkgs.httpie
+      pkgs.httpie
     ];
     services.vicinae = {
       enable = true;
       autoStart = true;
-
       settings = {
         theme.name = "tokyo-night";
-
         font.size = 11;
-
         faviconService = "twenty";
-
         popToRootOnClose = false;
-
         rootSearch.searchFiles = false;
-
         window = {
           csd = true;
           opacity = 0.75;
@@ -43,52 +43,83 @@
     };
     home.stateVersion = "25.11";
 
-
+    services.mpd = {
+      enable = true;
+      musicDirectory = "/home/pratham/Music";
+      extraConfig = ''
+        audio_output {
+          type "pipewire"
+            name "PipeWire"
+        }
+      '';
+    };
   };
-
 
   # Bootloader.
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
   boot.supportedFilesystems = [ "ntfs" ];
-  
-  # Add uinput module for Kanata
   boot.kernelModules = [ "uinput" ];
+
+fileSystems."/mnt/data" = {
+  device = "/dev/disk/by-uuid/CACCD7B9CCD79DCF";
+  fsType = "ntfs-3g";
+  options = [ "rw" "uid=1000" "gid=1000" "nofail" "windows_names" ];
+};
+
+
+  # Add uinput module for Kanata
 
   programs.kdeconnect.enable = true;
 
-
   programs.zsh.ohMyZsh = {
     theme = "robbyrussell";
-    plugins = [ "git" "sudo" "vi-mode" "zsh-history-substring-search" ];
+    plugins = [
+      "git"
+      "sudo"
+      "vi-mode"
+      "zsh-history-substring-search"
+    ];
 
   };
-
-  services.upower.enable = true;
-  services.mpd = {
+  services.navidrome = {
     enable = true;
+    settings = {
+      MusicFolder = "/home/pratham/Music";
+      Address = "0.0.0.0";
+      Port = 4533;
+      BaseUrl = "";
+      EnableSharing = true;
+    };
   };
+  systemd.services.navidrome.serviceConfig.ProtectHome = lib.mkForce false;
+  services.udisks2.enable = true;
+  services.gvfs.enable = true;
 
-  services.blueman.enable = true;
+
   services.jellyfin = {
     enable = true;
     openFirewall = true;
     user = "pratham";
   };
-
-  networking.firewall = { 
+  services.greetd = {
     enable = true;
-    allowedTCPPortRanges = [ 
-    { from = 1714; to = 1764; } # KDE Connect
-    ];  
-    allowedUDPPortRanges = [ 
-    { from = 1714; to = 1764; } # KDE Connect
-    ];  
+    settings = {
+      default_session = {
+        command = "Hyprland";
+        user = "pratham";
+      };
+    };
   };
+  services.upower.enable = true;
+
+  services.blueman.enable = true;
+  services.tailscale.enable = true;
+
 
   fonts.packages = with pkgs; [
- 	  nerd-fonts.fira-code
-  	nerd-fonts.droid-sans-mono
+    nerd-fonts.fira-code
+    nerd-fonts.droid-sans-mono
   ];
 
   # Enable uinput for Kanata
@@ -113,10 +144,9 @@
 
   virtualisation.docker = {
     enable = true;
-    enableOnBoot = false;  # Don't start at boot
+    enableOnBoot = false; # Don't start at boot
   };
-  
-  networking.hostName = "nixos"; # Define your hostname.
+
   systemd.services.NetworkManager-wait-online.enable = false;
 
   # Enable unfree packages (required for NVIDIA drivers)
@@ -125,7 +155,10 @@
   };
 
   nix.settings = {
-    experimental-features = [ "nix-command" "flakes" ];
+    experimental-features = [
+      "nix-command"
+      "flakes"
+    ];
     extra-substituters = [
       "https://vicinae.cachix.org"
     ];
@@ -134,10 +167,30 @@
     ];
   };
   # Enable networking
+  networking.hostName = "nixos"; # Define your hostname.
   networking.networkmanager.enable = true;
+  networking.extraHosts = ''
+    127.0.0.1 screenshot.local
+  '';
+  networking.firewall = {
+  enable = true;
+  allowedTCPPortRanges = [
+  {
+    from = 1714;
+    to = 1764;
+  } # KDE Connect
+  ];
+  allowedUDPPortRanges = [
+  {
+    from = 1714;
+    to = 1764;
+  } # KDE Connect
+  ];
+};
+
   programs.nix-ld.enable = true;
   programs.adb.enable = true;
-  
+
   # Set your time zone.
   time.timeZone = "Asia/Kolkata";
 
@@ -157,20 +210,19 @@
   };
 
   # Enable the X11 windowing system.
-  services.xserver.enable = true;
   services.flatpak.enable = true;
   services.snap.enable = false;
 
   programs.dconf.profiles.user.databases = [
-  {
-    settings."org/gnome/desktop/interface" = {
-      gtk-theme = "Adwaita";
-      icon-theme = "Flat-Remix-Red-Dark";
-      font-name = "Noto Sans Medium 11";
-      document-font-name = "Noto Sans Medium 11";
-      monospace-font-name = "Noto Sans Mono Medium 11";
-    };
-  }
+    {
+      settings."org/gnome/desktop/interface" = {
+        gtk-theme = "Adwaita";
+        icon-theme = "Flat-Remix-Red-Dark";
+        font-name = "Noto Sans Medium 11";
+        document-font-name = "Noto Sans Medium 11";
+        monospace-font-name = "Noto Sans Mono Medium 11";
+      };
+    }
   ];
 
   # NVIDIA Configuration (following official NixOS guide)
@@ -181,7 +233,6 @@
   };
 
   # Load nvidia driver for Xorg and Wayland
-  services.xserver.videoDrivers = [ "nvidia" ];
 
   hardware.nvidia = {
     # Modesetting is required.
@@ -213,11 +264,10 @@
       };
 
       # Bus IDs from your lspci output
-      amdgpuBusId = "PCI:5:0:0";  # AMD Renoir Vega
-      nvidiaBusId = "PCI:1:0:0";  # NVIDIA GTX 1650 Mobile
+      amdgpuBusId = "PCI:5:0:0"; # AMD Renoir Vega
+      nvidiaBusId = "PCI:1:0:0"; # NVIDIA GTX 1650 Mobile
     };
   };
-  services.teamviewer.enable = true;
 
   services.create_ap = {
     enable = false;
@@ -230,17 +280,17 @@
   };
 
   services.postgresql = {
-    enable = true;
+    enable = false;
 
     package = pkgs.postgresql_16; # Force PG 16.4 here
     ensureDatabases = [ "mydatabase" ];
     extraPlugins = with pkgs.postgresql_16.pkgs; [
-    timescaledb
-    # Add other extensions like postgis if needed
+      timescaledb
+      # Add other extensions like postgis if needed
     ];
 
     settings = {
-     shared_preload_libraries = "timescaledb";
+      shared_preload_libraries = "timescaledb";
     };
     authentication = pkgs.lib.mkOverride 10 ''
       # Allow local connections via Unix sockets without authentication
@@ -255,23 +305,20 @@
   };
 
   # Enable the GNOME Desktop Environment.
-  services.displayManager.sddm = {
-    enable = true;
-    theme = "sddm-astronaut";
-    wayland.enable = true;
-  };
+
+  #services.displayManager.sddm = {
+  #  enable = true;
+  #  theme = "sddm-astronaut-theme";
+  #  wayland.enable = true;
+  #};
 
   # Configure keymap in X11
-  services.xserver.xkb = {
-    layout = "us";
-    variant = "";
-  };
 
   # Enable CUPS to print documents.
   services.printing.enable = false;
-
   # Enable sound with pipewire.
   services.pulseaudio.enable = false;
+  security.pam.services.hyprlock = { };
   security.rtkit.enable = true;
   services.pipewire = {
     enable = true;
@@ -284,8 +331,13 @@
   users.users.pratham = {
     isNormalUser = true;
     description = "Pratham";
-    extraGroups = [ "networkmanager" "wheel" "docker" "uinput" ]; # Added uinput group
-    packages = with pkgs; [];
+    extraGroups = [
+      "networkmanager"
+      "wheel"
+      "docker"
+      "uinput"
+    ]; # Added uinput group
+    packages = with pkgs; [ ];
     shell = pkgs.zsh;
   };
 
@@ -295,7 +347,6 @@
   programs.firefox.enable = true;
   programs.steam.gamescopeSession.enable = true;
   programs.gamemode.enable = true;
-
 
   programs.zsh = {
     enable = true;
@@ -313,6 +364,7 @@
   # Install Hyprland
   programs.hyprland.enable = true;
   programs.hyprland.xwayland.enable = true;
+  programs.hyprlock.enable = true;
 
   # List packages installed in system profile. To search, run:
   # $ nix search wget
@@ -321,6 +373,7 @@
     kitty
     foot
     xdg-desktop-portal-hyprland
+    wl-clipboard
     glibc
     git
     waybar
@@ -363,7 +416,16 @@
     lutris-unwrapped
     yarn
     yazi
-    
+    hyprlock
+    hypridle
+    mpv
+    udiskie
+    mpc
+
+    jmtpfs
+
+
+
     # GPU utilities
     vulkan-tools
     pciutils
@@ -374,24 +436,25 @@
     lutris
     wineWowPackages.stable
     wine
+    greetd.tuigreet
     winetricks
-    sddm-astronaut
-    # JellyFin  
+    # JellyFin
     rmpc
     rustc
     cargo
+    brave
+    gimp
+    yt-dlp
+    nicotine-plus
+    nautilus
   ];
 
   environment.sessionVariables = {
-    STEAM_EXTRA_COMPACT_TOOLS_PATHS =
-      "/home/user/.steam/root/compatibilitytools.d";
+    STEAM_EXTRA_COMPACT_TOOLS_PATHS = "/home/user/.steam/root/compatibilitytools.d";
   };
 
   # Enable the OpenSSH daemon.
   # services.openssh.enable = true;
-  networking.extraHosts = ''
-    127.0.0.1 screenshot.local
-  '';
 
   # This value determines the NixOS release from which the default
   # settings for stateful data, like file locations and database versions

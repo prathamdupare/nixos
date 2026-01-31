@@ -16,19 +16,22 @@
     neo-tree = {
       enable = true;
 
-      enableDiagnostics = true;
-      enableGitStatus = true;
-      enableModifiedMarkers = true;
-      enableRefreshOnWrite = true;
-      closeIfLastWindow = true;
-      popupBorderStyle = "rounded";
-
       settings = {
+        enable_git_status = true;
+        enable_diagnostics = true;
+        enable_modified_markers = true;
+        enable_refresh_on_write = true;
+        close_if_last_window = true;
+        popup_border_style = "rounded";
+
         window.mappings."<space>" = "none";
 
         buffers = {
-          bindToCwd = false;
-          followCurrentFile.enabled = true;
+          bind_to_cwd = false;
+
+          follow_current_file = {
+            enabled = true;
+          };
         };
       };
     };
@@ -84,7 +87,15 @@
     # ── LSP ──────────────────────────────────────────────
     lsp = {
       enable = true;
-
+      onAttach = ''
+        vim.diagnostic.config({
+            virtual_text = true,    -- show inline messages
+            signs = true,           -- gutter signs
+            underline = true,       -- underline code
+            update_in_insert = false,
+            severity_sort = true
+            })
+      '';
       servers = {
         ts_ls.enable = true;
         eslint.enable = true;
